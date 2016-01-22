@@ -2,6 +2,10 @@
 
 Access webcam through Java with OpenCV VideoCapture
 
+## Features
+
+* Face Detection using Haar Cascades
+
 ## Build OpenCV library for Java
 
 You can get ```opencv-300.jar``` and ```libopencv_java300.so``` by the following two options:

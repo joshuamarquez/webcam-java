@@ -10,6 +10,12 @@ import javax.swing.JLabel;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfRect;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
@@ -21,11 +27,18 @@ public class App {
 
   private JFrame mFrame;
   private JLabel mJLabel;
+  private CascadeClassifier mCascadeClassifier;
 
   public static void main(String[] args) {    
     App app = new App();
     app.init();
+    app.loadCascade();
     app.camLoop(args);
+  }
+  
+  private void loadCascade() {
+    mCascadeClassifier = 
+        new CascadeClassifier("src/resources/haarcascade_frontalface.xml");
   }
 
   private void init() {
@@ -50,6 +63,7 @@ public class App {
       while (true) {
         mVideoCapture.read(mMat);
         if (!mMat.empty()) {
+          findAndDraw(mMat);
           mImage = toBufferedImage(mMat);
           ImageIcon imageIcon = new ImageIcon(mImage, "Webcam frame");
           mJLabel.setIcon(imageIcon);
@@ -79,5 +93,15 @@ public class App {
     System.arraycopy(buffer, 0, targetPixels, 0, buffer.length);
     
     return image;
+  }
+  
+  private void findAndDraw(Mat mMat) {
+    MatOfRect faceDetections = new MatOfRect();
+    mCascadeClassifier.detectMultiScale(mMat, faceDetections);
+    
+	for (Rect rect : faceDetections.toArray()) {
+      Imgproc.rectangle(mMat, new Point(rect.x, rect.y), 
+          new Point(rect.x + rect.width, rect.y + rect.height), new Scalar(0, 255, 0));
+    }
   }
 }
